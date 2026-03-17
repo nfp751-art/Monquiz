@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quel Super-Héros Es-Tu? | Which Superhero Are You?</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFD700;
+    --red: #E63946;
+    --blue: #1D3557;
+    --dark: #0a0a0f;
+    --darker: #050508;
+    --light: #f1f1f1;
+    --accent: #457B9D;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--darker);
+    color: var(--light);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(230,57,70,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(69,123,157,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.03) 0%, transparent 60%);
+    z-index: 0;
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes bgPulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+  }
+  .container { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 20px 16px 60px; }
+  .lang-bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 24px; }
+  .lang-btn {
+    background: transparent;
+    border: 1px solid rgba(255,215,0,0.3);
+    color: var(--gold);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 2px;
+    padding: 6px 16px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .lang-btn.active, .lang-btn:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+  header { text-align: center; margin-bottom: 40px; }
+  .title-small { font-size: 12px; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; opacity: 0.8; }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 96px); line-height: 0.9; letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: titleShine 4s ease-in-out infinite; background-size: 200% 200%;
+  }
+  @keyframes titleShine { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  .subtitle { font-size: 16px; color: rgba(241,241,241,0.5); letter-spacing: 3px; margin-top: 12px; text-transform: uppercase; }
+  .progress-wrap { margin-bottom: 32px; }
+  .progress-info { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 3px; color: rgba(255,215,0,0.6); margin-bottom: 8px; text-transform: uppercase; }
+  .progress-bar { height: 3px; background: rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--gold)); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px var(--gold); }
+  .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.12); padding: 36px; margin-bottom: 20px; position: relative; animation: cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--red), var(--gold)); }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .question-num { font-size: 11px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; opacity: 0.7; }
+  .question-text { font-size: clamp(18px, 4vw, 26px); font-weight: 700; line-height: 1.3; color: #fff; margin-bottom: 28px; }
+  .options { display: grid; gap: 10px; }
+  .option-btn {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--light); font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 600;
+    padding: 16px 20px; text-align: left; cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden; letter-spacing: 0.5px;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+  .option-btn::before { content: ''; position: absolute; left: 0; top: 0; width: 0; height: 100%; background: linear-gradient(90deg, rgba(230,57,70,0.15), rgba(255,215,0,0.05)); transition: width 0.3s; }
+  .option-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateX(4px); }
+  .option-btn:hover::before { width: 100%; }
+  .option-btn.selected { border-color: var(--gold); background: rgba(255,215,0,0.08); color: var(--gold); }
+  .ad-slot { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,215,0,0.2); padding: 20px; text-align: center; margin: 24px 0; position: relative; }
+  .ad-label { font-size: 9px; letter-spacing: 4px; color: rgba(255,255,255,0.2); text-transform: uppercase; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .ad-inner { background: linear-gradient(135deg, rgba(230,57,70,0.05), rgba(69,123,157,0.05)); border: 1px solid rgba(255,215,0,0.08); padding: 24px 16px; min-height: 90px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+  .ad-inner span { font-size: 12px; letter-spacing: 3px; color: rgba(255,255,255,0.15); text-transform: uppercase; }
+  .next-btn { display: block; width: 100%; padding: 18px; background: linear-gradient(135deg, var(--red), #c1121f); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; border: none; cursor: pointer; transition: all 0.2s; margin-top: 20px; clip-path: polygon(16px 0%, 100% 0%, calc(100% - 16px) 100%, 0% 100%); }
+  .next-btn:hover { background: linear-gradient(135deg, #c1121f, var(--red)); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,57,70,0.4); }
+  .next-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+  .ad-screen { display: none; text-align: center; animation: cardIn 0.4s ease; }
+  .ad-screen.visible { display: block; }
+  .ad-screen-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--gold); margin-bottom: 6px; }
+  .ad-screen-sub { font-size: 13px; letter-spacing: 3px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 20px; }
+  .ad-screen-slot { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.15); min-height: 250px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative; }
+  .ad-screen-slot .ad-label { top: 8px; }
+  .countdown { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--gold); line-height: 1; }
+  .countdown-sub { font-size: 12px; letter-spacing: 3px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-top: 4px; }
+  .skip-btn { display: inline-block; padding: 12px 32px; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'Rajdhani', sans-serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; }
+  .skip-btn.enabled { border-color: var(--gold); color: var(--gold); }
+  .skip-btn.enabled:hover { background: var(--gold); color: var(--dark); }
+  .result-screen { display: none; animation: cardIn 0.5s ease; }
+  .result-screen.visible { display: block; }
+  .result-hero-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 14vw, 110px); line-height: 0.85; background: linear-gradient(135deg, #fff 0%, var(--gold) 40%, var(--red) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; animation: heroReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes heroReveal { from { opacity: 0; transform: scale(0.8) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .result-universe { display: inline-block; background: var(--red); color: #fff; font-size: 11px; letter-spacing: 4px; padding: 4px 14px; text-transform: uppercase; margin-bottom: 24px; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .result-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.15); padding: 28px 32px; margin-bottom: 20px; text-align: left; position: relative; }
+  .result-card::after { content: ''; position: absolute; bottom: 0; right: 0; width: 60px; height: 60px; background: linear-gradient(135deg, transparent 50%, rgba(255,215,0,0.05) 50%); }
+  .result-label { font-size: 10px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; opacity: 0.7; }
+  .result-desc { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.8); }
+  .traits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .trait { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2); color: var(--gold); font-size: 11px; letter-spacing: 2px; padding: 5px 14px; text-transform: uppercase; clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%); }
+  .restart-btn { display: block; width: 100%; padding: 18px; background: transparent; border: 1px solid var(--gold); color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; cursor: pointer; transition: all 0.3s; margin-top: 20px; clip-path: polygon(16px 0%, 100% 0%, calc(100% - 16px) 100%, 0% 100%); }
+  .restart-btn:hover { background: var(--gold); color: var(--dark); }
+  .share-row { display: flex; gap: 10px; margin-top: 12px; }
+  .share-btn { flex: 1; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .share-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(69,123,157,0.1); }
+  .hero-emoji { font-size: 80px; display: block; margin: 20px auto; animation: float 3s ease-in-out infinite; text-align: center; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0; opacity: 0.3; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .divider::after { background: linear-gradient(90deg, var(--gold), transparent); }
+  .divider-icon { color: var(--gold); font-size: 12px; }
+  #quiz-screen { display: none; }
+  #quiz-screen.visible { display: block; }
+  #start-screen { display: block; }
+  .start-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.12); padding: 40px 36px; text-align: center; margin-bottom: 20px; }
+  .start-desc { font-size: 17px; line-height: 1.7; color: rgba(255,255,255,0.6); margin-bottom: 32px; }
+  .start-btn { display: inline-block; padding: 18px 48px; background: linear-gradient(135deg, var(--red), #c1121f); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 4px; border: none; cursor: pointer; transition: all 0.3s; clip-path: polygon(16px 0%, 100% 0%, calc(100% - 16px) 100%, 0% 100%); }
+  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(230,57,70,0.5); }
+  .hero-icons { display: flex; justify-content: center; gap: 16px; font-size: 44px; margin-bottom: 28px; flex-wrap: wrap; }
+  @media (max-width: 480px) { .card { padding: 24px 18px; } .result-card { padding: 20px; } .start-card { padding: 28px 18px; } }
+  .copied-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--dark); padding: 10px 24px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; z-index: 100; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); pointer-events: none; }
+  .copied-msg.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('fr')" id="btn-fr">FR</button>
+    <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+  </div>
+  <header>
+    <div class="title-small" id="title-small">Découvre ton identité secrète</div>
+    <h1 id="main-title">QUEL HÉROS<br>ES-TU ?</h1>
+    <div class="subtitle" id="subtitle">Marvel & DC · 8 Questions</div>
+  </header>
+  <div class="ad-slot">
+    <span class="ad-label">Advertisement</span>
+    <div class="ad-inner"><span>728 × 90 — Leaderboard Ad</span></div>
+  </div>
+  <div id="start-screen">
+    <div class="start-card">
+      <div class="hero-icons">🦸‍♂️⚡🕷️🦇💚🔴🌟🛡️</div>
+      <p class="start-desc" id="start-desc">Réponds à 8 questions pour découvrir quel super-héros Marvel ou DC sommeille en toi. Tes choix révèleront ta véritable identité héroïque !</p>
+      <button class="start-btn" onclick="startQuiz()" id="start-btn-text">COMMENCER LE QUIZ</button>
+    </div>
+  </div>
+  <div id="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="q-label">Question 1/8</span>
+        <span id="q-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="card" id="question-card">
+      <div class="question-num" id="q-num">Question 01</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="options-container"></div>
+      <button class="next-btn" id="next-btn" disabled onclick="nextStep()">SUIVANT →</button>
+    </div>
+  </div>
+  <div id="ad-screen" class="ad-screen">
+    <div class="ad-screen-title" id="ad-title">PAUSE HÉROÏQUE</div>
+    <div class="ad-screen-sub" id="ad-sub">Ton résultat arrive bientôt...</div>
+    <div class="ad-screen-slot">
+      <span class="ad-label">Advertisement</span>
+      <div style="text-align:center;">
+        <div style="width:300px;height:250px;background:rgba(255,215,0,0.03);border:1px solid rgba(255,215,0,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto;">
+          <span style="font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.1);text-transform:uppercase;">300 × 250 — Rectangle Ad</span>
+        </div>
+      </div>
+    </div>
+    <div class="countdown" id="countdown">5</div>
+    <div class="countdown-sub" id="countdown-sub">secondes</div>
+    <br>
+    <button class="skip-btn" id="skip-btn" disabled onclick="proceedFromAd()">Passer</button>
+  </div>
+  <div id="result-screen" class="result-screen">
+    <div class="divider"><span class="divider-icon">✦</span></div>
+    <div style="text-align:center;">
+      <div class="title-small" id="result-label-top">Tu es...</div>
+      <div class="hero-emoji" id="result-emoji">🦸</div>
+      <div class="result-hero-name" id="result-name"></div>
+      <div class="result-universe" id="result-universe"></div>
+    </div>
+    <div class="result-card">
+      <div class="result-label" id="desc-label">Profil héroïque</div>
+      <div class="result-desc" id="result-desc"></div>
+      <div class="traits" id="result-traits"></div>
+    </div>
+    <div class="ad-slot">
+      <span class="ad-label">Advertisement</span>
+      <div class="ad-inner"><span>728 × 90 — Result Page Ad</span></div>
+    </div>
+    <div class="share-row">
+      <button class="share-btn" onclick="shareResult()" id="share-btn">↗ Partager</button>
+      <button class="share-btn" onclick="copyResult()" id="copy-btn">⎘ Copier</button>
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()" id="restart-btn">↺ RECOMMENCER</button>
+  </div>
+</div>
+<div class="copied-msg" id="copied-msg">✓ Copié !</div>
+<script>
+const data = {
+  fr: {
+    titleSmall: "Découvre ton identité secrète",
+    mainTitle: "QUEL HÉROS<br>ES-TU ?",
+    subtitle: "Marvel & DC · 8 Questions",
+    startDesc: "Réponds à 8 questions pour découvrir quel super-héros Marvel ou DC sommeille en toi. Tes choix révèleront ta véritable identité héroïque !",
+    startBtn: "COMMENCER LE QUIZ",
+    qLabel: (c, t) => `Question ${c}/${t}`,
+    nextBtn: "SUIVANT →",
+    adTitle: "PAUSE HÉROÏQUE",
+    adSub: "Ton résultat arrive bientôt...",
+    countdownSub: "secondes",
+    skipBtn: "Passer",
+    resultLabelTop: "Tu es...",
+    descLabel: "Profil héroïque",
+    shareBtn: "↗ Partager",
+    copyBtn: "⎘ Copier",
+    restartBtn: "↺ RECOMMENCER",
+    copiedMsg: "✓ Copié !",
+    shareText: (name) => `Je suis ${name} ! Découvre ton super-héros Marvel/DC →`,
+    questions: [
+      { text: "Face à une menace, ta première réaction est...", options: ["Foncer tête baissée, le courage avant tout", "Observer, analyser, puis agir avec précision", "Protéger ceux qui m'entourent", "Trouver une solution inattendue et créative"] },
+      { text: "Quel est ton plus grand atout ?", options: ["Ma force et ma détermination inébranlable", "Mon intelligence et ma technologie", "Mon empathie et ma connexion aux autres", "Mon agilité et mon sens de l'humour"] },
+      { text: "Tu viens de recevoir des super-pouvoirs. Tu fais quoi ?", options: ["Je deviens aussitôt un héros pour défendre les innocents", "Je m'entraîne en secret jusqu'à maîtriser parfaitement mes pouvoirs", "Je cherche à comprendre d'où ils viennent et leurs conséquences", "Je teste mes limites et profite un peu avant de choisir"] },
+      { text: "Quel environnement te correspond le mieux ?", options: ["La ville, au cœur de l'action et du bruit", "La nuit, dans les ombres et les ruelles sombres", "La nature, les espaces ouverts et le ciel", "Un laboratoire ou un atelier bien équipé"] },
+      { text: "Ton point faible avoué est...", options: ["Mon ego et mon côté impulsif", "Mon manque de confiance envers les autres", "Ma tendance à trop me sacrifier pour les autres", "Ma difficulté à me prendre au sérieux"] },
+      { text: "Comment tes amis te décriraient-ils ?", options: ["Courageux(se), parfois imprudent(e)", "Mystérieux(se) et indépendant(e)", "Loyal(e) et toujours présent(e)", "Drôle et plein(e) de ressources"] },
+      { text: "Quel est ton rapport à la justice ?", options: ["La fin justifie les moyens, il faut parfois sortir des règles", "Les règles existent pour une raison, je les respecte", "La justice doit être accessible à tous, sans exception", "La vraie justice inclut la compassion et le pardon"] },
+      { text: "Quelle citation te parle le plus ?", options: [""Un grand pouvoir implique de grandes responsabilités"", ""Je suis Iron Man"", ""I'm Batman"", ""Je peux faire ça toute la journée""] }
+    ],
+    results: [
+      { name: "SPIDER-MAN", emoji: "🕷️", universe: "MARVEL", desc: "Tu es Peter Parker — intelligent, débrouillard et profondément humain. Tu portes un lourd fardeau mais ne lâches jamais. Tu trouves un équilibre entre ta vie ordinaire et tes responsabilités extraordinaires, toujours avec humour et cœur.", traits: ["Agile", "Intelligent", "Responsable", "Humoristique", "Empathique"] },
+      { name: "IRON MAN", emoji: "🤖", universe: "MARVEL", desc: "Tu es Tony Stark — brillant, visionnaire et incroyablement confiant. Tu transformes chaque problème en opportunité grâce à ton génie et ta technologie. Un ego XXL, mais un cœur qui ne faiblit jamais.", traits: ["Ingénieux", "Charismatique", "Visionnaire", "Ambitieux", "Courageux"] },
+      { name: "BATMAN", emoji: "🦇", universe: "DC", desc: "Tu es Bruce Wayne — déterminé, solitaire et animé par une volonté d'acier. Tu opères dans l'ombre avec une précision chirurgicale. Pas de super-pouvoirs, juste une préparation sans faille et un code moral implacable.", traits: ["Stratège", "Discipliné", "Solitaire", "Déterminé", "Intense"] },
+      { name: "CAPTAIN AMERICA", emoji: "🛡️", universe: "MARVEL", desc: "Tu es Steve Rogers — le héros au grand cœur, symbole de droiture et de sacrifice. Tu crois en l'humanité même quand tout va mal. Leader naturel, tu inspires ceux qui t'entourent par ta loyauté et ton intégrité sans faille.", traits: ["Loyal", "Intègre", "Leader", "Courageux", "Protecteur"] },
+      { name: "WONDER WOMAN", emoji: "⚔️", universe: "DC", desc: "Tu es Diana Prince — guerrière puissante animée par la compassion. Tu combines la force brute et la sagesse. Tu te bats pour la paix avec une détermination sans égale.", traits: ["Puissant(e)", "Sage", "Compassionnel(le)", "Guerrier(ère)", "Noble"] },
+      { name: "THOR", emoji: "⚡", universe: "MARVEL", desc: "Tu es Thor Odinson — impétueux, fier et doté d'une force légendaire. Tu es né pour la grandeur mais tu apprends l'humilité au fil des épreuves. Ta générosité et ta bravoure font de toi un allié inestimable.", traits: ["Puissant(e)", "Fier(e)", "Généreux(se)", "Impétueux(se)", "Noble"] },
+      { name: "BLACK PANTHER", emoji: "🐾", universe: "MARVEL", desc: "Tu es T'Challa — roi, guerrier et protecteur de son peuple. Tu allies sagesse politique, combat maîtrisé et sens des responsabilités. Calme en surface, redoutable au combat.", traits: ["Sage", "Noble", "Stratège", "Protecteur", "Élégant(e)"] },
+      { name: "HULK", emoji: "💚", universe: "MARVEL", desc: "Tu es Bruce Banner — deux êtres en un. Une intelligence rare cache une puissance brute colossale. Tu luttes pour maîtriser ta force intérieure, mais une fois libérée, rien ne peut t'arrêter.", traits: ["Puissant(e)", "Intelligent(e)", "Passionné(e)", "Intense", "Imprévisible"] }
+    ]
+  },
+  en: {
+    titleSmall: "Discover your secret identity",
+    mainTitle: "WHICH HERO<br>ARE YOU?",
+    subtitle: "Marvel & DC · 8 Questions",
+    startDesc: "Answer 8 questions to discover which Marvel or DC superhero lives within you. Your choices will reveal your true heroic identity!",
+    startBtn: "START QUIZ",
+    qLabel: (c, t) => `Question ${c}/${t}`,
+    nextBtn: "NEXT →",
+    adTitle: "HEROIC PAUSE",
+    adSub: "Your result is coming soon...",
+    countdownSub: "seconds",
+    skipBtn: "Skip",
+    resultLabelTop: "You are...",
+    descLabel: "Heroic Profile",
+    shareBtn: "↗ Share",
+    copyBtn: "⎘ Copy",
+    restartBtn: "↺ PLAY AGAIN",
+    copiedMsg: "✓ Copied!",
+    shareText: (name) => `I'm ${name}! Discover your Marvel/DC superhero →`,
+    questions: [
+      { text: "Facing a threat, your first reaction is...", options: ["Charge in headfirst — courage above all", "Observe, analyze, then act with precision", "Protect those around me no matter what", "Find an unexpected, creative solution"] },
+      { text: "What is your greatest asset?", options: ["My strength and unwavering determination", "My intelligence and technology", "My empathy and connection with others", "My agility and sense of humor"] },
+      { text: "You just received superpowers. What do you do?", options: ["Immediately become a hero to defend the innocent", "Train in secret until I've fully mastered my powers", "Try to understand their origin and consequences", "Test my limits and enjoy them a bit before deciding"] },
+      { text: "Which environment suits you best?", options: ["The city, at the heart of the action and noise", "The night, in shadows and dark alleys", "Nature, open spaces and the sky", "A well-equipped lab or workshop"] },
+      { text: "Your acknowledged weakness is...", options: ["My ego and impulsive side", "My lack of trust in others", "My tendency to sacrifice too much for others", "My difficulty taking myself seriously"] },
+      { text: "How would your friends describe you?", options: ["Brave, sometimes reckless", "Mysterious and independent", "Loyal and always there", "Funny and resourceful"] },
+      { text: "What is your relationship with justice?", options: ["The ends justify the means — rules can be broken", "Rules exist for a reason — I follow them", "Justice must be accessible to everyone, no exceptions", "True justice includes compassion and forgiveness"] },
+      { text: "Which quote resonates with you the most?", options: [""With great power comes great responsibility"", ""I am Iron Man"", ""I'm Batman"", ""I can do this all day""] }
+    ],
+    results: [
+      { name: "SPIDER-MAN", emoji: "🕷️", universe: "MARVEL", desc: "You are Peter Parker — smart, resourceful, and deeply human. You carry a heavy burden but never give up. You balance ordinary life with extraordinary responsibilities, always with humor and heart.", traits: ["Agile", "Smart", "Responsible", "Humorous", "Empathetic"] },
+      { name: "IRON MAN", emoji: "🤖", universe: "MARVEL", desc: "You are Tony Stark — brilliant, visionary, and incredibly confident. You turn every problem into an opportunity through your genius and technology. A massive ego, but a heart that never falters.", traits: ["Ingenious", "Charismatic", "Visionary", "Ambitious", "Brave"] },
+      { name: "BATMAN", emoji: "🦇", universe: "DC", desc: "You are Bruce Wayne — determined, solitary, and driven by iron will. You operate in the shadows with surgical precision. No superpowers, just flawless preparation and an unyielding moral code.", traits: ["Strategist", "Disciplined", "Solitary", "Determined", "Intense"] },
+      { name: "CAPTAIN AMERICA", emoji: "🛡️", universe: "MARVEL", desc: "You are Steve Rogers — the big-hearted hero, symbol of righteousness and sacrifice. You believe in humanity even when everything goes wrong. A natural leader, you inspire those around you with unwavering loyalty.", traits: ["Loyal", "Integrity", "Leader", "Brave", "Protective"] },
+      { name: "WONDER WOMAN", emoji: "⚔️", universe: "DC", desc: "You are Diana Prince — a powerful warrior driven by compassion. You combine raw strength with wisdom. You fight for peace with unmatched determination.", traits: ["Powerful", "Wise", "Compassionate", "Warrior", "Noble"] },
+      { name: "THOR", emoji: "⚡", universe: "MARVEL", desc: "You are Thor Odinson — impetuous, proud, and legendarily strong. Born for greatness, you learn humility through trials. Your generosity and bravery make you an invaluable ally.", traits: ["Powerful", "Proud", "Generous", "Impetuous", "Noble"] },
+      { name: "BLACK PANTHER", emoji: "🐾", universe: "MARVEL", desc: "You are T'Challa — king, warrior, and protector of his people. You combine political wisdom, mastered combat, and a sense of responsibility. Always acting for the greater good.", traits: ["Wise", "Noble", "Strategist", "Protective", "Elegant"] },
+      { name: "HULK", emoji: "💚", universe: "MARVEL", desc: "You are Bruce Banner — two beings in one. Rare intelligence hides colossal raw power. You struggle to control your inner strength, but once unleashed, nothing can stop you.", traits: ["Powerful", "Intelligent", "Passionate", "Intense", "Unpredictable"] }
+    ]
+  }
+};
+
+<script>
+let lang = 'fr';
+let currentQ = 0;
+let answers = [];
+let selectedOption = null;
+let adShown = false;
+let countdownInterval = null;
+const AD_TRIGGER = 4;
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-fr').classList.toggle('active', l === 'fr');
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  updateTexts();
+}
+
+function setText(id, val, html) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (html) el.innerHTML = val; else el.textContent = val;
+}
+
+function updateTexts() {
+  const d = data[lang];
+  setText('title-small', d.titleSmall, true);
+  setText('main-title', d.mainTitle, true);
+  setText('subtitle', d.subtitle);
+  setText('start-desc', d.startDesc, true);
+  setText('start-btn-text', d.startBtn);
+  setText('ad-title', d.adTitle);
+  setText('ad-sub', d.adSub);
+  setText('countdown-sub', d.countdownSub);
+  setText('skip-btn', d.skipBtn);
+  setText('result-label-top', d.resultLabelTop);
+  setText('desc-label', d.descLabel);
+  setText('share-btn', d.shareBtn);
+  setText('copy-btn', d.copyBtn);
+  setText('restart-btn', d.restartBtn);
+  setText('copied-msg', d.copiedMsg);
+  if (document.getElementById('quiz-screen').classList.contains('visible')) renderQuestion();
+}
+
+function startQuiz() {
+  currentQ = 0; answers = []; adShown = false; selectedOption = null;
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('result-screen').classList.remove('visible');
+  document.getElementById('quiz-screen').classList.add('visible');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const d = data[lang];
+  const q = d.questions[currentQ];
+  const total = d.questions.length;
+  const pct = Math.round((currentQ / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-label').textContent = d.qLabel(currentQ + 1, total);
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('q-num').textContent = `Question ${String(currentQ + 1).padStart(2, '0')}`;
+  document.getElementById('q-text').textContent = q.text;
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    if (answers[currentQ] === i) { btn.classList.add('selected'); selectedOption = i; }
+    btn.onclick = () => selectOption(i);
+    container.appendChild(btn);
+  });
+  selectedOption = answers[currentQ] !== undefined ? answers[currentQ] : null;
+  document.getElementById('next-btn').disabled = selectedOption === null;
+  document.getElementById('next-btn').textContent = data[lang].nextBtn;
+}
+
+function selectOption(index) {
+  selectedOption = index;
+  answers[currentQ] = index;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === index);
+  });
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextStep() {
+  const total = data[lang].questions.length;
+  if (currentQ === AD_TRIGGER - 1 && !adShown) {
+    document.getElementById('quiz-screen').classList.remove('visible');
+    document.getElementById('ad-screen').classList.add('visible');
+    startCountdown();
+    return;
+  }
+  currentQ++;
+  if (currentQ >= total) {
+    showResult();
+  } else {
+    renderQuestion();
+    const card = document.getElementById('question-card');
+    card.style.animation = 'none';
+    void card.offsetWidth;
+    card.style.animation = 'cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+  }
+}
+
+function startCountdown() {
+  let sec = 5;
+  document.getElementById('countdown').textContent = sec;
+  document.getElementById('skip-btn').disabled = true;
+  document.getElementById('skip-btn').classList.remove('enabled');
+  countdownInterval = setInterval(() => {
+    sec--;
+    document.getElementById('countdown').textContent = sec;
+    if (sec <= 0) {
+      clearInterval(countdownInterval);
+      document.getElementById('skip-btn').disabled = false;
+      document.getElementById('skip-btn').classList.add('enabled');
+    }
+  }, 1000);
+}
+
+function proceedFromAd() {
+  adShown = true;
+  document.getElementById('ad-screen').classList.remove('visible');
+  document.getElementById('quiz-screen').classList.add('visible');
+  currentQ++;
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').classList.remove('visible');
+  document.getElementById('ad-screen').classList.remove('visible');
+  const scores = [0,0,0,0,0,0,0,0];
+  const mapping = [
+    [0, 1, 3, 0],
+    [3, 1, 4, 0],
+    [3, 2, 1, 7],
+    [0, 2, 5, 1],
+    [5, 2, 4, 7],
+    [3, 2, 6, 0],
+    [2, 3, 6, 4],
+    [0, 1, 2, 3],
+  ];
+  answers.forEach((ans, qi) => {
+    if (mapping[qi] && mapping[qi][ans] !== undefined) scores[mapping[qi][ans]]++;
+  });
+  let maxScore = -1, heroIndex = 0;
+  scores.forEach((s, i) => { if (s > maxScore) { maxScore = s; heroIndex = i; } });
+  const d = data[lang];
+  const hero = d.results[heroIndex];
+  document.getElementById('result-name').innerHTML = hero.name;
+  document.getElementById('result-emoji').textContent = hero.emoji;
+  document.getElementById('result-universe').textContent = hero.universe;
+  document.getElementById('result-desc').textContent = hero.desc;
+  document.getElementById('result-label-top').textContent = d.resultLabelTop;
+  document.getElementById('desc-label').textContent = d.descLabel;
+  const traitsContainer = document.getElementById('result-traits');
+  traitsContainer.innerHTML = '';
+  hero.traits.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'trait';
+    span.textContent = t;
+    traitsContainer.appendChild(span);
+  });
+  document.getElementById('share-btn').textContent = d.shareBtn;
+  document.getElementById('copy-btn').textContent = d.copyBtn;
+  document.getElementById('restart-btn').textContent = d.restartBtn;
+  document.getElementById('result-screen').classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareResult() {
+  const name = document.getElementById('result-name').textContent;
+  const text = data[lang].shareText(name);
+  if (navigator.share) {
+    navigator.share({ title: text, text: text, url: window.location.href });
+  } else {
+    copyToClipboard(text + ' ' + window.location.href);
+  }
+}
+
+function copyResult() {
+  const name = document.getElementById('result-name').textContent;
+  copyToClipboard(data[lang].shareText(name) + ' ' + window.location.href);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('copied-msg');
+    msg.textContent = data[lang].copiedMsg;
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2500);
+  });
+}
+
+function restartQuiz() {
+  document.getElementById('result-screen').classList.remove('visible');
+  document.getElementById('quiz-screen').classList.remove('visible');
+  document.getElementById('ad-screen').classList.remove('visible');
+  document.getElementById('start-screen').style.display = 'block';
+  currentQ = 0; answers = []; adShown = false; selectedOption = null;
+}
+</script>
+</body>
+</html>
